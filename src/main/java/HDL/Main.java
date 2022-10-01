@@ -55,7 +55,7 @@ public class Main {
     // Construct an interpreter and run it on the parse tree
     Interpreter interpreter = new Interpreter();
     Expr result = interpreter.visit(parseTree);
-    System.out.println("Result is: " + result.eval());
+    System.out.println("Result is: " + result.eval(new Environment()));
   }
 }
 
@@ -81,7 +81,7 @@ class Interpreter extends AbstractParseTreeVisitor<Expr> implements HDLVisitor<E
 
   @Override
   public Expr visitConstant(ConstantContext ctx) {
-    return new Constant(Integer.parseInt(ctx.c.getText()));
+    return new Constant(Boolean.parseBoolean(ctx.c.getText()));
   }
 
   @Override

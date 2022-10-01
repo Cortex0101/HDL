@@ -5,6 +5,15 @@ import java.util.Map.Entry;
 
 class Environment {
   private final HashMap<String, Boolean> variableValues = new HashMap<>();
+  private int clockTick;
+
+  public int getClockTick() {
+    return clockTick;
+  }
+
+  public void nextClockTick() {
+    ++clockTick;
+  }
 
   public Environment() { }
 
