@@ -3,19 +3,18 @@ package HDL;
 import ANTLR.HDLLexer;
 import ANTLR.HDLParser;
 import ANTLR.HDLParser.ANDContext;
-import ANTLR.HDLParser.AssignContext;
-import ANTLR.HDLParser.CMDHardwareContext;
-import ANTLR.HDLParser.CMDInputsContext;
-import ANTLR.HDLParser.CMDLatchContext;
-import ANTLR.HDLParser.CMDOutputsContext;
-import ANTLR.HDLParser.CMDSimulateContext;
-import ANTLR.HDLParser.CMDUpdateContext;
+import ANTLR.HDLParser.AssignmentContext;
 import ANTLR.HDLParser.ConstantContext;
-import ANTLR.HDLParser.InstantiateContext;
+import ANTLR.HDLParser.HardwareContext;
+import ANTLR.HDLParser.InputsContext;
+import ANTLR.HDLParser.LatchContext;
 import ANTLR.HDLParser.NOTContext;
 import ANTLR.HDLParser.ORContext;
+import ANTLR.HDLParser.OutputsContext;
 import ANTLR.HDLParser.ParenthesesContext;
+import ANTLR.HDLParser.SimulateContext;
 import ANTLR.HDLParser.StartContext;
+import ANTLR.HDLParser.UpdateContext;
 import ANTLR.HDLParser.VariableContext;
 import ANTLR.HDLVisitor;
 import java.io.IOException;
@@ -54,8 +53,12 @@ public class Main {
 
     // Construct an interpreter and run it on the parse tree
     Interpreter interpreter = new Interpreter();
-    Expr result = interpreter.visit(parseTree);
-    System.out.println("Result is: " + result.eval(new Environment()));
+    AST result = interpreter.visit(parseTree);
+    if (result instanceof Command) {
+      ((Command) result).eval(new Environment());
+    } else {
+      System.out.println(((Expr) result).eval(new Environment()));
+    }
   }
 }
 
@@ -64,78 +67,75 @@ public class Main {
 // This is parameterized over a return type "<T>" which is in our case
 // simply a Double.
 
-class Interpreter extends AbstractParseTreeVisitor<Expr> implements HDLVisitor<Expr> {
-  public Expr visitStart(StartContext ctx) {
+class Interpreter extends AbstractParseTreeVisitor<AST> implements HDLVisitor<AST> {
+  public AST visitStart(StartContext ctx) {
     return visit(ctx.e1);
   }
 
   @Override
-  public Expr visitVariable(VariableContext ctx) {
+  public AST visitOR(ORContext ctx) {
+    return new OR((Expr) visit(ctx.e1), (Expr) visit(ctx.e2));
+  }
+
+  @Override
+  public AST visitNOT(NOTContext ctx) {
+    return new NOT((Expr) visit(ctx.e1));
+  }
+
+  @Override
+  public AST visitAND(ANDContext ctx) {
+    return new AND((Expr) visit(ctx.e1), (Expr) visit(ctx.e2));
+  }
+
+  @Override
+  public AST visitParentheses(ParenthesesContext ctx) {
+    return visit(ctx.e1);
+  }
+
+
+  @Override
+  public AST visitConstant(ConstantContext ctx) {
+    return new Constant(Boolean.parseBoolean(ctx.c.getText()));
+  }
+
+
+  @Override
+  public AST visitVariable(VariableContext ctx) {
     return new Variable(ctx.x.getText());
   }
 
   @Override
-  public Expr visitOR(ORContext ctx) {
-    return new OR(visit(ctx.e1), visit(ctx.e2));
+  public AST visitAssignment(AssignmentContext ctx) {
+    return new Assignment(ctx.e1.getText(), (Expr) visit(ctx.e2));
   }
 
   @Override
-  public Expr visitConstant(ConstantContext ctx) {
-    return new Constant(Boolean.parseBoolean(ctx.c.getText()));
+  public AST visitLatch(LatchContext ctx) {
+    return ctx.
   }
 
   @Override
-  public Expr visitCMDSimulate(CMDSimulateContext ctx) {
+  public AST visitHardware(HardwareContext ctx) {
     return null;
   }
 
   @Override
-  public Expr visitCMDOutputs(CMDOutputsContext ctx) {
+  public AST visitSimulate(SimulateContext ctx) {
     return null;
   }
 
   @Override
-  public Expr visitNOT(NOTContext ctx) {
-    return new NOT(visit(ctx.e1));
-  }
-
-  @Override
-  public Expr visitCMDHardware(CMDHardwareContext ctx) {
+  public AST visitOutputs(OutputsContext ctx) {
     return null;
   }
 
   @Override
-  public Expr visitCMDUpdate(CMDUpdateContext ctx) {
+  public AST visitUpdate(UpdateContext ctx) {
     return null;
   }
 
   @Override
-  public Expr visitAND(ANDContext ctx) {
-    return new AND(visit(ctx.e1), visit(ctx.e2));
-  }
-
-  @Override
-  public Expr visitAssign(AssignContext ctx) {
-    return null;
-  }
-
-  @Override
-  public Expr visitInstantiate(InstantiateContext ctx) {
-    return null;
-  }
-
-  @Override
-  public Expr visitCMDInputs(CMDInputsContext ctx) {
-    return null;
-  }
-
-  @Override
-  public Expr visitParentheses(ParenthesesContext ctx) {
-    return visit(ctx.e1);
-  }
-
-  @Override
-  public Expr visitCMDLatch(CMDLatchContext ctx) {
+  public AST visitInputs(InputsContext ctx) {
     return null;
   }
 }

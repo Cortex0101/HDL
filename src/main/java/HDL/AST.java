@@ -21,14 +21,6 @@ abstract class Expr extends AST {
   public abstract Boolean eval(Environment env);
 }
 
-class Assign extends Expr {
-
-  @Override
-  public Boolean eval(Environment env) {
-    return null;
-  }
-}
-
 class NOT extends Expr {
   Expr e1;
 
@@ -86,8 +78,7 @@ class Variable extends Expr {
     this.varname = varname;
   }
   public Boolean eval(Environment env){
-    System.out.println("Variable not implemented, assuming " + varname + " = 0");
-    return false;
+    env.getVariable(varname);
   };
 };
 
@@ -102,8 +93,9 @@ class Latch extends Expr {
 
   @Override
   public Boolean eval(Environment env) {
+    Boolean prevValue = value;
     this.value = env.getVariable(inputName);
-    return this.value;
+    return prevValue;
   }
 }
 
@@ -160,5 +152,26 @@ class Circuit extends AST {
     for (int i = 0; i < N; i++) {
       nextCycle();
     }
+  }
+}
+
+
+abstract class Command extends AST {
+  public abstract void eval(Environment env);
+}
+
+
+class Assignment extends Command {
+  String varname;
+  Expr e;
+
+  Assignment(String varname, Expr e) {
+    this.varname = varname;
+    this.e = e;
+  }
+
+  @Override
+  public void eval(Environment env) {
+    env.setVariable(varname,e.eval(env));
   }
 }

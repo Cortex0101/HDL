@@ -17,101 +17,94 @@ public interface HDLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStart(HDLParser.StartContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code NOT}
+	 * labeled alternative in {@link HDLParser#boolexpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNOT(HDLParser.NOTContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code Variable}
-	 * labeled alternative in {@link HDLParser#expr}.
+	 * labeled alternative in {@link HDLParser#boolexpr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitVariable(HDLParser.VariableContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code OR}
-	 * labeled alternative in {@link HDLParser#expr}.
+	 * labeled alternative in {@link HDLParser#boolexpr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitOR(HDLParser.ORContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code Constant}
-	 * labeled alternative in {@link HDLParser#expr}.
+	 * labeled alternative in {@link HDLParser#boolexpr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitConstant(HDLParser.ConstantContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code CMDSimulate}
-	 * labeled alternative in {@link HDLParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCMDSimulate(HDLParser.CMDSimulateContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code CMDOutputs}
-	 * labeled alternative in {@link HDLParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCMDOutputs(HDLParser.CMDOutputsContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code NOT}
-	 * labeled alternative in {@link HDLParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNOT(HDLParser.NOTContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code CMDHardware}
-	 * labeled alternative in {@link HDLParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCMDHardware(HDLParser.CMDHardwareContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code CMDUpdate}
-	 * labeled alternative in {@link HDLParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCMDUpdate(HDLParser.CMDUpdateContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code AND}
-	 * labeled alternative in {@link HDLParser#expr}.
+	 * labeled alternative in {@link HDLParser#boolexpr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitAND(HDLParser.ANDContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Assign}
-	 * labeled alternative in {@link HDLParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAssign(HDLParser.AssignContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Instantiate}
-	 * labeled alternative in {@link HDLParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInstantiate(HDLParser.InstantiateContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code CMDInputs}
-	 * labeled alternative in {@link HDLParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCMDInputs(HDLParser.CMDInputsContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code Parentheses}
-	 * labeled alternative in {@link HDLParser#expr}.
+	 * labeled alternative in {@link HDLParser#boolexpr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitParentheses(HDLParser.ParenthesesContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code CMDLatch}
+	 * Visit a parse tree produced by the {@code Assignment}
 	 * labeled alternative in {@link HDLParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCMDLatch(HDLParser.CMDLatchContext ctx);
+	T visitAssignment(HDLParser.AssignmentContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Hardware}
+	 * labeled alternative in {@link HDLParser#cmd}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHardware(HDLParser.HardwareContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Latch}
+	 * labeled alternative in {@link HDLParser#cmd}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLatch(HDLParser.LatchContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Inputs}
+	 * labeled alternative in {@link HDLParser#cmd}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInputs(HDLParser.InputsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Outputs}
+	 * labeled alternative in {@link HDLParser#cmd}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOutputs(HDLParser.OutputsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Update}
+	 * labeled alternative in {@link HDLParser#cmd}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUpdate(HDLParser.UpdateContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Simulate}
+	 * labeled alternative in {@link HDLParser#cmd}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSimulate(HDLParser.SimulateContext ctx);
 }
