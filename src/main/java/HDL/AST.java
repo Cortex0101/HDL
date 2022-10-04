@@ -1,19 +1,9 @@
 package HDL;
 
-/*
-     | e1 = Expr '->' e2 = Expr   #Instantiate
-     | IDENTIFIER '=' e1 = Expr   #Assign
-     | '(' e1 = Expr ')'          #Parentheses
-     | '.hardware' IDENTIFIER     #CMDHardware
-     | '.inputs' IDENTIFIER       #CMDInputs
-     | '.outputs' IDENTIFIER      #CMDOutputs
-     | '.latch' e1 = Expr         #CMDLatch
-     | '.update'                  #CMDUpdate
-     | '.simulate'                #CMDSimulate
- */
-
+import ANTLR.HDLParser.LatchContext;
 import java.awt.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public abstract class AST{};
 
@@ -32,6 +22,11 @@ class NOT extends Expr {
   public Boolean eval(Environment env) {
     return !e1.eval(env);
   }
+
+  @Override
+  public String toString() {
+    return "!" + e1;
+  }
 }
 
 class AND extends Expr {
@@ -46,6 +41,11 @@ class AND extends Expr {
   @Override
   public Boolean eval(Environment env) {
     return e1.eval(env) && e2.eval(env);
+  }
+
+  @Override
+  public String toString() {
+    return e1 + " && " + e2;
   }
 }
 
@@ -62,6 +62,11 @@ class OR extends Expr {
   public Boolean eval(Environment env) {
     return e1.eval(env) || e2.eval(env);
   }
+
+  @Override
+  public String toString() {
+    return e1 + " || " + e2;
+  }
 }
 
 class Constant extends Expr {
@@ -70,6 +75,11 @@ class Constant extends Expr {
   public Boolean eval(Environment env){
     return x;
   };
+
+  @Override
+  public String toString() {
+    return String.valueOf(x);
+  }
 };
 
 class Variable extends Expr {
@@ -78,86 +88,14 @@ class Variable extends Expr {
     this.varname = varname;
   }
   public Boolean eval(Environment env){
-    env.getVariable(varname);
+    return env.getVariable(varname);
   };
-};
-
-class Latch extends Expr {
-  Boolean value;
-  String inputName;
-
-  Latch(String inputName) {
-    this.value = false;
-    this.inputName = inputName;
-  }
-
-  @Override
-  public Boolean eval(Environment env) {
-    Boolean prevValue = value;
-    this.value = env.getVariable(inputName);
-    return prevValue;
-  }
-}
-
-class Trace extends AST {
-  String signalName;
-  ArrayList<Boolean> signalAtTimePoint;
-
-  Trace(ArrayList<Boolean> values) {
-    signalAtTimePoint = new ArrayList<>(values);
-  }
-
-  Trace(String signalName) {
-    this.signalName = signalName;
-  }
-
-  public int getSize() {
-    return signalAtTimePoint.size();
-  }
 
   @Override
   public String toString() {
-    return "Trace{" +
-        "signalName='" + signalName + '\'' +
-        ", signalAtTimePoint=" + signalAtTimePoint +
-        '}';
+    return varname;
   }
-}
-
-class Circuit extends AST {
-  boolean value;
-
-  ArrayList<Trace> inputs;
-  ArrayList<Trace> outputs;
-  ArrayList<Latch> latches;
-
-  Circuit(ArrayList<Trace> inputs, ArrayList<Trace> outputs) {
-    this.inputs = inputs;
-    this.outputs = outputs;
-  }
-
-  Circuit() {
-    inputs = new ArrayList<Trace>();
-    outputs = new ArrayList<Trace>();
-    latches = new ArrayList<Latch>();
-  }
-  public void initialize() {
-    this.value = false;
-  }
-
-
-  public void nextCycle(){
-
-  }
-
-  public void runSimulator() {
-    final int N = inputs.get(0).getSize(); // all inputs should be same size, and there should be at least one input.
-    initialize();
-    for (int i = 0; i < N; i++) {
-      nextCycle();
-    }
-  }
-}
+};
 
 abstract class Command extends AST {
   public abstract void eval(Environment env);
@@ -177,18 +115,98 @@ class Assignment extends Command {
   public void eval(Environment env) {
     env.setVariable(varname,e.eval(env));
   }
-}
 
-class Sequence extends Command{
-  Command c1,c2;
-  Sequence(Command c1,Command c2){this.c1=c1; this.c2=c2;}
-  public void eval(Environment env){
-    c1.eval(env);
-    c2.eval(env);
+  @Override
+  public String toString() {
+    return varname + " = " + e;
   }
 }
 
-class NOP extends Command{
-  NOP(){}
-  public void eval(Environment env){};
+class Trace extends AST {
+  String name;
+  public ArrayList<Boolean> data;
+
+  public Trace(String name, ArrayList<Boolean> data) {
+    this.name = name;
+    this.data = data;
+  }
+
+  public  Trace(String name) {
+    this(name, new ArrayList<>());
+  }
+
+  @Override
+  public String toString() {
+    return "Trace{" +
+        "name='" + name + '\'' +
+        ", data=" + Arrays.toString(data.toArray()) +
+        '}';
+  }
+}
+
+class Latch extends AST {
+  String inputName;
+  String outputName;
+
+  public Latch(String inputName, String outputName) {
+    this.inputName = inputName;
+    this.outputName = outputName;
+  }
+
+  @Override
+  public String toString() {
+    return "Latch{" +
+        "inputName='" + inputName + '\'' +
+        ", outputName='" + outputName + '\'' +
+        '}';
+  }
+}
+
+class SimulatorArg extends AST {
+  public String argName;
+  ArrayList<Boolean> value = new ArrayList<>();
+
+  public SimulatorArg(String argName, ArrayList<Boolean> values) {
+    this.argName = argName;
+    this.value = values;
+  }
+
+  @Override
+  public String toString() {
+    return "SimulatorArg{" +
+        "argName='" + argName + '\'' +
+        ", value=" + Arrays.toString(value.toArray()) +
+        '}';
+  }
+}
+
+
+class Circuit extends AST {
+  String hardwareName;
+
+  ArrayList<Trace> inputs;
+  ArrayList<Trace> outputs;
+  ArrayList<Latch> latches;
+  ArrayList<Assignment> updates;
+  ArrayList<SimulatorArg> simArg;
+
+  public Circuit( ArrayList<Trace> inputs, ArrayList<Trace> outputs, ArrayList<Latch> latches, ArrayList<Assignment> assignments, ArrayList<SimulatorArg> simArg, String name) {
+    this.hardwareName = name;
+    this.inputs = inputs;
+    this.outputs = outputs;
+    this.latches = latches;
+    this.updates = assignments;
+    this.simArg = simArg;}
+
+  @Override
+  public String toString() {
+    return "Circuit{" +
+        "hardwareName='" + hardwareName + '\n' +
+        ", inputs=" + Arrays.toString(inputs.toArray()) + '\n' +
+        ", outputs=" + Arrays.toString(outputs.toArray()) + '\n'  +
+        ", latches=" + Arrays.toString(latches.toArray()) + '\n'  +
+        ", updates=" + Arrays.toString(updates.toArray()) + '\n'  +
+        ", simArg=" + Arrays.toString(simArg.toArray()) +
+        '}';
+  }
 }

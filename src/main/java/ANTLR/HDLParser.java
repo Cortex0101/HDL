@@ -95,19 +95,21 @@ public class HDLParser extends Parser {
 	}
 
 	public static class StartContext extends ParserRuleContext {
+		public Token name;
 		public Token IDENTIFIER;
-		public List<Token> e1 = new ArrayList<Token>();
+		public List<Token> ins = new ArrayList<Token>();
+		public List<Token> outs = new ArrayList<Token>();
 		public LatchContext latch;
 		public List<LatchContext> larg = new ArrayList<LatchContext>();
 		public AssignmentContext assignment;
 		public List<AssignmentContext> aarg = new ArrayList<AssignmentContext>();
 		public SimulateArgsContext simulateArgs;
 		public List<SimulateArgsContext> sarg = new ArrayList<SimulateArgsContext>();
+		public TerminalNode EOF() { return getToken(HDLParser.EOF, 0); }
 		public List<TerminalNode> IDENTIFIER() { return getTokens(HDLParser.IDENTIFIER); }
 		public TerminalNode IDENTIFIER(int i) {
 			return getToken(HDLParser.IDENTIFIER, i);
 		}
-		public TerminalNode EOF() { return getToken(HDLParser.EOF, 0); }
 		public List<LatchContext> latch() {
 			return getRuleContexts(LatchContext.class);
 		}
@@ -155,7 +157,7 @@ public class HDLParser extends Parser {
 			setState(10);
 			match(T__0);
 			setState(11);
-			match(IDENTIFIER);
+			((StartContext)_localctx).name = match(IDENTIFIER);
 			setState(12);
 			match(T__1);
 			setState(14); 
@@ -166,7 +168,7 @@ public class HDLParser extends Parser {
 				{
 				setState(13);
 				((StartContext)_localctx).IDENTIFIER = match(IDENTIFIER);
-				((StartContext)_localctx).e1.add(((StartContext)_localctx).IDENTIFIER);
+				((StartContext)_localctx).ins.add(((StartContext)_localctx).IDENTIFIER);
 				}
 				}
 				setState(16); 
@@ -183,7 +185,7 @@ public class HDLParser extends Parser {
 				{
 				setState(19);
 				((StartContext)_localctx).IDENTIFIER = match(IDENTIFIER);
-				((StartContext)_localctx).e1.add(((StartContext)_localctx).IDENTIFIER);
+				((StartContext)_localctx).outs.add(((StartContext)_localctx).IDENTIFIER);
 				}
 				}
 				setState(22); 

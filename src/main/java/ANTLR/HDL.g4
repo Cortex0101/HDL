@@ -1,8 +1,8 @@
 grammar HDL;
 
-start : '.hardware' IDENTIFIER
-        '.inputs' e1 += IDENTIFIER+
-        '.outputs' e1 += IDENTIFIER+
+start : '.hardware' name = IDENTIFIER
+        '.inputs' ins += IDENTIFIER+
+        '.outputs' outs += IDENTIFIER+
         larg += latch*
         '.update' aarg += assignment+
         '.simulate' sarg += simulateArgs+

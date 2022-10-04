@@ -4,19 +4,11 @@ import ANTLR.HDLLexer;
 import ANTLR.HDLParser;
 import ANTLR.HDLParser.ANDContext;
 import ANTLR.HDLParser.AssignmentContext;
-import ANTLR.HDLParser.ConstantContext;
-import ANTLR.HDLParser.HardwareContext;
-import ANTLR.HDLParser.IdentifiersContext;
-import ANTLR.HDLParser.InputsContext;
 import ANTLR.HDLParser.LatchContext;
-import ANTLR.HDLParser.NOPContext;
 import ANTLR.HDLParser.NOTContext;
 import ANTLR.HDLParser.ORContext;
-import ANTLR.HDLParser.OutputsContext;
 import ANTLR.HDLParser.ParenthesesContext;
-import ANTLR.HDLParser.SequenceContext;
 import ANTLR.HDLParser.SimulateArgsContext;
-import ANTLR.HDLParser.SimulateContext;
 import ANTLR.HDLParser.StartContext;
 import ANTLR.HDLParser.UpdateContext;
 import ANTLR.HDLParser.VariableContext;
@@ -59,11 +51,7 @@ public class Main {
     // Construct an interpreter and run it on the parse tree
     Interpreter interpreter = new Interpreter();
     AST result = interpreter.visit(parseTree);
-    if (result instanceof Command) {
-      ((Command) result).eval(new Environment());
-    } else {
-      System.out.println(((Expr) result).eval(new Environment()));
-    }
+    System.out.println(((Circuit)result).toString());
   }
 }
 
@@ -73,13 +61,48 @@ public class Main {
 // simply a Double.
 
 class Interpreter extends AbstractParseTreeVisitor<AST> implements HDLVisitor<AST> {
-  public AST visitStart(StartContext ctx) {
-    return visit(ctx.e1);
-  }
 
-  @Override
-  public AST visitLatch(LatchContext ctx) {
-    return null;
+  public AST visitStart(StartContext ctx) {
+    String name = ctx.name.getText();
+
+    ArrayList<String> inNames = new ArrayList<>();
+    ArrayList<String> outNames = new ArrayList<>();
+    for (var c : ctx.ins) {
+      inNames.add(c.getText());
+    };
+
+    for (var c : ctx.outs) {
+      outNames.add(c.getText());
+    }
+
+    ArrayList<Latch> latches = new ArrayList<>();
+    for (var c : ctx.larg) {
+      latches.add((Latch) visit(c));
+    }
+
+    ArrayList<Trace> inTraces = new ArrayList<>();
+    ArrayList<Trace> outTraces = new ArrayList<>();
+
+    for (int i = 0; i < inNames.size(); ++i) {
+      inTraces.add(new Trace(inNames.get(i)));
+    }
+
+    for (int i = 0; i < outNames.size(); ++i) {
+      outTraces.add(new Trace(outNames.get(i)));
+    }
+
+    ArrayList<Assignment> assignments = new ArrayList<>();
+    for (var c : ctx.aarg) {
+      assignments.add((Assignment) visit(c));
+    }
+
+    ArrayList<SimulatorArg> simArgs = new ArrayList<>();
+
+    for (var c : ctx.sarg) {
+      simArgs.add((SimulatorArg) visit(c));
+    }
+
+    return new Circuit(inTraces, outTraces, latches, assignments, simArgs, name);
   }
 
   @Override
@@ -103,7 +126,6 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements HDLVisitor<AS
   }
 
 
-
   @Override
   public AST visitVariable(VariableContext ctx) {
     return new Variable(ctx.x.getText());
@@ -111,29 +133,25 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements HDLVisitor<AS
 
   @Override
   public AST visitAssignment(AssignmentContext ctx) {
-    return new Assignment(ctx.e1.getText(), (Expr) visit(ctx.e2));
+
+    return new Assignment(ctx.e1.getText(), (Expr) visit(ctx.e2.get(0))); //PROBOBLY DOES NOT WORK
   }
 
   @Override
   public AST visitSimulateArgs(SimulateArgsContext ctx) {
-    return null;
+    ArrayList<Boolean> values = new ArrayList<>();
+    for (char c : ctx.e2.getText().toCharArray()) {
+      if (c == '0')
+        values.add(false);
+      if (c == '1')
+        values.add(true);
+    }
+    return new SimulatorArg(ctx.e1.getText(), values);
   }
 
   @Override
-  public AST visitIdentifiers(IdentifiersContext ctx) {
-    ArrayList<Trace> inputs = new ArrayList<>();
-    for (var c : ctx.identifierss) {
-      inputs.add(new Trace(c.getText()));
-    }
-
-  }
-
-  public AST visitSequence(SequenceContext ctx){
-    return new Sequence((Command)visit(ctx.c),(Command)visit(ctx.cs));
-  }
-
-  public AST visitNOP(NOPContext ctx){
-    return new NOP();
+  public AST visitLatch(LatchContext ctx) {
+    return new Latch(ctx.e1.getText(), ctx.e2.getText());
   }
 }
 
