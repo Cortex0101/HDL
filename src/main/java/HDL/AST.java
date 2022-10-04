@@ -99,12 +99,16 @@ class Latch extends Expr {
   }
 }
 
-class Trace extends Expr {
+class Trace extends AST {
   String signalName;
   ArrayList<Boolean> signalAtTimePoint;
 
   Trace(ArrayList<Boolean> values) {
     signalAtTimePoint = new ArrayList<>(values);
+  }
+
+  Trace(String signalName) {
+    this.signalName = signalName;
   }
 
   public int getSize() {
@@ -118,11 +122,6 @@ class Trace extends Expr {
         ", signalAtTimePoint=" + signalAtTimePoint +
         '}';
   }
-
-  @Override
-  public Boolean eval(Environment env) {
-    return null;
-  }
 }
 
 class Circuit extends AST {
@@ -131,6 +130,11 @@ class Circuit extends AST {
   ArrayList<Trace> inputs;
   ArrayList<Trace> outputs;
   ArrayList<Latch> latches;
+
+  Circuit(ArrayList<Trace> inputs, ArrayList<Trace> outputs) {
+    this.inputs = inputs;
+    this.outputs = outputs;
+  }
 
   Circuit() {
     inputs = new ArrayList<Trace>();
@@ -155,7 +159,6 @@ class Circuit extends AST {
   }
 }
 
-
 abstract class Command extends AST {
   public abstract void eval(Environment env);
 }
@@ -174,4 +177,18 @@ class Assignment extends Command {
   public void eval(Environment env) {
     env.setVariable(varname,e.eval(env));
   }
+}
+
+class Sequence extends Command{
+  Command c1,c2;
+  Sequence(Command c1,Command c2){this.c1=c1; this.c2=c2;}
+  public void eval(Environment env){
+    c1.eval(env);
+    c2.eval(env);
+  }
+}
+
+class NOP extends Command{
+  NOP(){}
+  public void eval(Environment env){};
 }

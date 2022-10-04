@@ -17,6 +17,12 @@ public interface HDLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStart(HDLParser.StartContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link HDLParser#latch}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLatch(HDLParser.LatchContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code NOT}
 	 * labeled alternative in {@link HDLParser#boolexpr}.
 	 * @param ctx the parse tree
@@ -38,13 +44,6 @@ public interface HDLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitOR(HDLParser.ORContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Constant}
-	 * labeled alternative in {@link HDLParser#boolexpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitConstant(HDLParser.ConstantContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code AND}
 	 * labeled alternative in {@link HDLParser#boolexpr}.
 	 * @param ctx the parse tree
@@ -59,52 +58,15 @@ public interface HDLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitParentheses(HDLParser.ParenthesesContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Assignment}
-	 * labeled alternative in {@link HDLParser#expr}.
+	 * Visit a parse tree produced by {@link HDLParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitAssignment(HDLParser.AssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Hardware}
-	 * labeled alternative in {@link HDLParser#cmd}.
+	 * Visit a parse tree produced by {@link HDLParser#simulateArgs}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitHardware(HDLParser.HardwareContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Latch}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLatch(HDLParser.LatchContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Inputs}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInputs(HDLParser.InputsContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Outputs}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOutputs(HDLParser.OutputsContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Update}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitUpdate(HDLParser.UpdateContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Simulate}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSimulate(HDLParser.SimulateContext ctx);
+	T visitSimulateArgs(HDLParser.SimulateArgsContext ctx);
 }

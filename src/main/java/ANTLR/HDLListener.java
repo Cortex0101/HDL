@@ -18,6 +18,16 @@ public interface HDLListener extends ParseTreeListener {
 	 */
 	void exitStart(HDLParser.StartContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link HDLParser#latch}.
+	 * @param ctx the parse tree
+	 */
+	void enterLatch(HDLParser.LatchContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link HDLParser#latch}.
+	 * @param ctx the parse tree
+	 */
+	void exitLatch(HDLParser.LatchContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code NOT}
 	 * labeled alternative in {@link HDLParser#boolexpr}.
 	 * @param ctx the parse tree
@@ -54,18 +64,6 @@ public interface HDLListener extends ParseTreeListener {
 	 */
 	void exitOR(HDLParser.ORContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Constant}
-	 * labeled alternative in {@link HDLParser#boolexpr}.
-	 * @param ctx the parse tree
-	 */
-	void enterConstant(HDLParser.ConstantContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Constant}
-	 * labeled alternative in {@link HDLParser#boolexpr}.
-	 * @param ctx the parse tree
-	 */
-	void exitConstant(HDLParser.ConstantContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code AND}
 	 * labeled alternative in {@link HDLParser#boolexpr}.
 	 * @param ctx the parse tree
@@ -90,87 +88,23 @@ public interface HDLListener extends ParseTreeListener {
 	 */
 	void exitParentheses(HDLParser.ParenthesesContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Assignment}
-	 * labeled alternative in {@link HDLParser#expr}.
+	 * Enter a parse tree produced by {@link HDLParser#assignment}.
 	 * @param ctx the parse tree
 	 */
 	void enterAssignment(HDLParser.AssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code Assignment}
-	 * labeled alternative in {@link HDLParser#expr}.
+	 * Exit a parse tree produced by {@link HDLParser#assignment}.
 	 * @param ctx the parse tree
 	 */
 	void exitAssignment(HDLParser.AssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Hardware}
-	 * labeled alternative in {@link HDLParser#cmd}.
+	 * Enter a parse tree produced by {@link HDLParser#simulateArgs}.
 	 * @param ctx the parse tree
 	 */
-	void enterHardware(HDLParser.HardwareContext ctx);
+	void enterSimulateArgs(HDLParser.SimulateArgsContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code Hardware}
-	 * labeled alternative in {@link HDLParser#cmd}.
+	 * Exit a parse tree produced by {@link HDLParser#simulateArgs}.
 	 * @param ctx the parse tree
 	 */
-	void exitHardware(HDLParser.HardwareContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Latch}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void enterLatch(HDLParser.LatchContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Latch}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void exitLatch(HDLParser.LatchContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Inputs}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void enterInputs(HDLParser.InputsContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Inputs}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void exitInputs(HDLParser.InputsContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Outputs}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void enterOutputs(HDLParser.OutputsContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Outputs}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void exitOutputs(HDLParser.OutputsContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Update}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void enterUpdate(HDLParser.UpdateContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Update}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void exitUpdate(HDLParser.UpdateContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code Simulate}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void enterSimulate(HDLParser.SimulateContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code Simulate}
-	 * labeled alternative in {@link HDLParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void exitSimulate(HDLParser.SimulateContext ctx);
+	void exitSimulateArgs(HDLParser.SimulateArgsContext ctx);
 }

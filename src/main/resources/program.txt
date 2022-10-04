@@ -1,8 +1,7 @@
-.hardware helloworld
-.inputs Reset
-.outputs Oscillator
-.latch Oscillator -> OscillatorM
-.update
-Oscillator = !OscillatorM && !Reset
-.simulate
-Reset=0000100
+Clr = RedM && !YelM
+Req = (ReqM || Button) && !Clr
+Red = !RedM && YelM || RedM && !YelM
+Yel = !RedM && !YelM && Req || RedM && !YelM
+Green  = !Red && !Yel
+PGreen = Red && !Yel
+PRed   = !PGreen

@@ -6,18 +6,23 @@ import ANTLR.HDLParser.ANDContext;
 import ANTLR.HDLParser.AssignmentContext;
 import ANTLR.HDLParser.ConstantContext;
 import ANTLR.HDLParser.HardwareContext;
+import ANTLR.HDLParser.IdentifiersContext;
 import ANTLR.HDLParser.InputsContext;
 import ANTLR.HDLParser.LatchContext;
+import ANTLR.HDLParser.NOPContext;
 import ANTLR.HDLParser.NOTContext;
 import ANTLR.HDLParser.ORContext;
 import ANTLR.HDLParser.OutputsContext;
 import ANTLR.HDLParser.ParenthesesContext;
+import ANTLR.HDLParser.SequenceContext;
+import ANTLR.HDLParser.SimulateArgsContext;
 import ANTLR.HDLParser.SimulateContext;
 import ANTLR.HDLParser.StartContext;
 import ANTLR.HDLParser.UpdateContext;
 import ANTLR.HDLParser.VariableContext;
 import ANTLR.HDLVisitor;
 import java.io.IOException;
+import java.util.ArrayList;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -73,6 +78,11 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements HDLVisitor<AS
   }
 
   @Override
+  public AST visitLatch(LatchContext ctx) {
+    return null;
+  }
+
+  @Override
   public AST visitOR(ORContext ctx) {
     return new OR((Expr) visit(ctx.e1), (Expr) visit(ctx.e2));
   }
@@ -93,11 +103,6 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements HDLVisitor<AS
   }
 
 
-  @Override
-  public AST visitConstant(ConstantContext ctx) {
-    return new Constant(Boolean.parseBoolean(ctx.c.getText()));
-  }
-
 
   @Override
   public AST visitVariable(VariableContext ctx) {
@@ -110,33 +115,25 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements HDLVisitor<AS
   }
 
   @Override
-  public AST visitLatch(LatchContext ctx) {
-    return ctx.
-  }
-
-  @Override
-  public AST visitHardware(HardwareContext ctx) {
+  public AST visitSimulateArgs(SimulateArgsContext ctx) {
     return null;
   }
 
   @Override
-  public AST visitSimulate(SimulateContext ctx) {
-    return null;
+  public AST visitIdentifiers(IdentifiersContext ctx) {
+    ArrayList<Trace> inputs = new ArrayList<>();
+    for (var c : ctx.identifierss) {
+      inputs.add(new Trace(c.getText()));
+    }
+
   }
 
-  @Override
-  public AST visitOutputs(OutputsContext ctx) {
-    return null;
+  public AST visitSequence(SequenceContext ctx){
+    return new Sequence((Command)visit(ctx.c),(Command)visit(ctx.cs));
   }
 
-  @Override
-  public AST visitUpdate(UpdateContext ctx) {
-    return null;
-  }
-
-  @Override
-  public AST visitInputs(InputsContext ctx) {
-    return null;
+  public AST visitNOP(NOPContext ctx){
+    return new NOP();
   }
 }
 
