@@ -1,7 +1,5 @@
 package HDL;
 
-import ANTLR.HDLParser.LatchContext;
-import java.awt.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -153,6 +151,14 @@ class Latch extends AST {
     this.outputName = outputName;
   }
 
+  public void initialize(Environment environment) {
+    environment.setVariable(outputName, false);
+  }
+
+  public void nextCycle(Environment environment) {
+    environment.setVariable(outputName, environment.getVariable(inputName));
+  }
+
   @Override
   public String toString() {
     return "Latch{" +
@@ -182,21 +188,83 @@ class SimulatorArg extends AST {
 
 
 class Circuit extends AST {
+
+  Environment environment;
   String hardwareName;
 
   ArrayList<Trace> inputs;
   ArrayList<Trace> outputs;
   ArrayList<Latch> latches;
   ArrayList<Assignment> updates;
-  ArrayList<SimulatorArg> simArg;
+  ArrayList<SimulatorArg> simArgs;
 
-  public Circuit( ArrayList<Trace> inputs, ArrayList<Trace> outputs, ArrayList<Latch> latches, ArrayList<Assignment> assignments, ArrayList<SimulatorArg> simArg, String name) {
+  public Circuit( ArrayList<Trace> inputs, ArrayList<Trace> outputs, ArrayList<Latch> latches, ArrayList<Assignment> assignments, ArrayList<SimulatorArg> simArgs, String name, Environment environment) {
     this.hardwareName = name;
     this.inputs = inputs;
     this.outputs = outputs;
     this.latches = latches;
     this.updates = assignments;
-    this.simArg = simArg;}
+    this.simArgs = simArgs;
+    this.environment = environment;
+  }
+
+  public void nextCycle(int i) {
+    // Read current input values and store it in envirement
+    for (SimulatorArg simArg : simArgs) {
+      environment.setVariable(simArg.argName, simArg.value.get(i));
+    }
+
+    // Call initialize or nextCycle for each latch
+    if (i == 0) {
+      for (Latch latch : latches) {
+        latch.initialize(environment);
+      }
+    } else {
+      for (Latch latch : latches) {
+        latch.nextCycle(environment);
+      }
+    }
+
+    // Call eval of every update (ie. assignment)
+    for (Assignment update : updates) {
+      update.eval(environment);
+    }
+
+    // Store value of all output signals appropiately
+    for (Trace output : outputs) {
+      output.data.add(environment.getVariable(output.name));
+    }
+  }
+
+  public void runSimulator() {
+    final int inputSize = getInputSize();
+    for (int i = 0; i < inputSize; i++) {
+      nextCycle(i);
+    }
+
+    printOutputs();
+  }
+
+  public void printOutputs() {
+    for (Trace output : outputs) {
+      for (Boolean bool : output.data) {
+        System.out.print(bool == false ? "0" : "1");
+      }
+
+      System.out.println(" " + output.name);
+    }
+  }
+
+  private int getInputSize() {
+    if (simArgs.isEmpty())
+      throw new RuntimeException("No simulation arguments provided!");
+    final int firstSize = simArgs.get(0).value.size();
+    for (SimulatorArg s : simArgs) {
+      if (s.value.size() != firstSize)
+        throw new RuntimeException("Simulation arguments not of same size!");
+    }
+    return simArgs.get(0).value.size();
+  }
 
   @Override
   public String toString() {
@@ -206,7 +274,7 @@ class Circuit extends AST {
         ", outputs=" + Arrays.toString(outputs.toArray()) + '\n'  +
         ", latches=" + Arrays.toString(latches.toArray()) + '\n'  +
         ", updates=" + Arrays.toString(updates.toArray()) + '\n'  +
-        ", simArg=" + Arrays.toString(simArg.toArray()) +
+        ", simArgs=" + Arrays.toString(simArgs.toArray()) +
         '}';
   }
 }

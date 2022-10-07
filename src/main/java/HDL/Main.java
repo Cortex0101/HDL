@@ -51,7 +51,7 @@ public class Main {
     // Construct an interpreter and run it on the parse tree
     Interpreter interpreter = new Interpreter();
     AST result = interpreter.visit(parseTree);
-    System.out.println(((Circuit)result).toString());
+    ((Circuit)result).runSimulator();
   }
 }
 
@@ -69,7 +69,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements HDLVisitor<AS
     ArrayList<String> outNames = new ArrayList<>();
     for (var c : ctx.ins) {
       inNames.add(c.getText());
-    };
+    }
 
     for (var c : ctx.outs) {
       outNames.add(c.getText());
@@ -102,7 +102,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements HDLVisitor<AS
       simArgs.add((SimulatorArg) visit(c));
     }
 
-    return new Circuit(inTraces, outTraces, latches, assignments, simArgs, name);
+    return new Circuit(inTraces, outTraces, latches, assignments, simArgs, name, new Environment());
   }
 
   @Override
